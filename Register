@@ -1,0 +1,147 @@
+import React, { useState } from "react";
+import usersService from "../../services/userService";
+
+function Register() {
+   const [registerFormData, setRegisterFormData] = useState({
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      passwordConfirm: "",
+      avatarURL: "",
+      tenantId: "U03ANH4GMUP1",
+   });
+
+   const onRegisterSubmitClicked = (e) => {
+      e.preventDefault();
+      let payload = registerFormData;
+      usersService.register(payload).then(onRegisterSuccess).catch(onRegisterError);
+   };
+
+   const onRegisterSuccess = (response) => {
+      console.log(response);
+   };
+
+   const onRegisterError = (error) => {
+      console.log(error);
+   };
+
+   const onRegisterDataChange = (e) => {
+      const target = e.target;
+      const value = target.value;
+      const name = target.name;
+
+      setRegisterFormData((prevState) => {
+         let newRegisterFormData = { ...prevState };
+         console.log(newRegisterFormData);
+         newRegisterFormData[name] = value;
+
+         return newRegisterFormData;
+      });
+   };
+
+   return (
+      <React.Fragment>
+         <div className="row">
+            <div className="col">
+               <form className="webForm">
+                  <div className="mb-3 formfields">
+                     <label className="form-label">First Name</label>
+                     <input
+                        type="text"
+                        className="form-control"
+                        id="firstName"
+                        aria-describedby="firstNameHelp"
+                        placeholder="Enter Your First Name"
+                        onChange={onRegisterDataChange}
+                        value={registerFormData.firstName}
+                        name="firstName"
+                     />
+                     <div id="firstNameHelp" className="form-text">
+                        {/* We'll never share your information with anyone else. */}
+                     </div>
+                  </div>
+                  <div className="mb-3 formfields">
+                     <label className="form-label">Last Name</label>
+                     <input
+                        type="text"
+                        className="form-control"
+                        id="lastName"
+                        aria-describedby="lastNameHelp"
+                        placeholder="Enter Your Last Name"
+                        onChange={onRegisterDataChange}
+                        value={registerFormData.lastName}
+                        name="lastName"
+                     />
+                     <div id="lastNameHelp" className="form-text">
+                        {/* We'll never share your information with anyone else. */}
+                     </div>
+                  </div>
+                  <div className="mb-3 formfields">
+                     <label className="form-label">Email address</label>
+                     <input
+                        type="email"
+                        className="form-control"
+                        id="email"
+                        aria-describedby="loginEmailHelp"
+                        placeholder="Enter Your Email Address"
+                        onChange={onRegisterDataChange}
+                        value={registerFormData.email}
+                        name="email"
+                     />
+                     <div id="loginEmailHelp" className="form-text"></div>
+                  </div>
+                  <div className="mb-3">
+                     <label className="form-label">Password</label>
+                     <input
+                        type="password"
+                        className="form-control"
+                        id="password"
+                        placeholder="Enter Your Password"
+                        onChange={onRegisterDataChange}
+                        value={registerFormData.password}
+                        name="password"
+                     />
+                  </div>
+                  <div className="mb-3">
+                     <label className="form-label">Password</label>
+                     <input
+                        type="password"
+                        className="form-control"
+                        id="passwordConfirm"
+                        placeholder="Confirm Your Password"
+                        onChange={onRegisterDataChange}
+                        value={registerFormData.passwordConfirm}
+                        name="passwordConfirm"
+                     />
+                  </div>
+                  <div className="mb-3 formfields">
+                     <label className="form-label">Profile URL</label>
+                     <input
+                        type="text"
+                        className="form-control"
+                        id="avatarURL"
+                        aria-describedby="profileUrlHelp"
+                        placeholder="Enter Your Profile URL"
+                        onChange={onRegisterDataChange}
+                        value={registerFormData.avatarURL}
+                        name="avatarURL"
+                     />
+                     <div id="profileUrlHelp" className="form-text">
+                        {/* We'll never share your information with anyone else. */}
+                     </div>
+                  </div>
+                  <button
+                     type="submit"
+                     className="btn btn-primary"
+                     onClick={onRegisterSubmitClicked}
+                  >
+                     Submit
+                  </button>
+               </form>
+            </div>
+         </div>
+      </React.Fragment>
+   );
+}
+export default Register;
