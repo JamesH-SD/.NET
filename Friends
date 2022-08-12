@@ -1,0 +1,136 @@
+import React, { useState, useEffect, useCallback } from "react";
+import peopleService from "../../services/peopleService";
+import { useNavigate } from "react-router-dom";
+import Person from "../Person";
+
+function PeoplePage() {
+   const [pageData, setPageData] = useState({
+      arrayOfPeople: [],
+      peopleComponents: [],
+   });
+   const [count, setCount] = useState(0);
+   const [showCards, setShowCards] = useState(false);
+
+   useEffect(() => {
+      console.log("Firing userEffect");
+
+      peopleService.getPeople().then(onGetPeopleSuccess).catch(onGetPeopleError);
+   }, []);
+
+   const onGetPeopleSuccess = (data) => {
+      // this comes back from onGlobalSuccess
+      console.log(data); //onGlobalSuccess returns response.data
+      let arrayOfPeeps = data.items;
+
+      // _logger("Got my Peeps", arrayOfPeeps);
+
+      setPageData((prevState) => {
+         const pd = { ...prevState };
+         pd.arrayOfPeople = arrayOfPeeps;
+         pd.peopleComponents = arrayOfPeeps.map(mapPerson);
+
+         return pd;
+      });
+   };
+
+   const onGetPeopleError = (error) => {
+      console.log("I got People issues", error);
+   };
+
+   const onDeleteClicked = useCallback((myPerson, eObj) => {
+      console.log(myPerson.id, { myPerson, eObj });
+
+      peopleService
+         .deleteFriendsById(myPerson.id)
+         .then(onDeleteFriendsByIdSuccess)
+         .catch(onDeleteFriendsByIdError);
+   }, []);
+
+   const onDeleteFriendsByIdSuccess = (idToBeDeleted) => {
+      console.log("Delete Successful", idToBeDeleted);
+
+      setPageData((prevState) => {
+         const pd = { ...prevState };
+         pd.arrayOfPeople = [...pd.arrayOfPeople];
+
+         const idxOf = pd.arrayOfPeople.findIndex((person) => {
+            let result = false;
+
+            if (person.id === idToBeDeleted) {
+               result = true;
+            }
+            return result;
+         });
+
+         if (idxOf > 0) {
+            pd.arrayOfPeople.splice(idxOf, 1);
+            pd.peopleComponents = pd.arrayOfPeople.map(mapPerson);
+         }
+         return pd;
+      });
+   };
+
+   const onDeleteFriendsByIdError = (err) => {
+      console.log("Delete Issues", err);
+   };
+
+   const mapPerson = (aPerson) => {
+      console.log("Mapping", aPerson);
+      return (
+         <Person
+            person={aPerson}
+            key={"ListA-" + aPerson.id}
+            onPersonClicked={onDeleteClicked}
+         />
+      );
+   };
+
+   const onHeaderClicked = () => {
+      // this function will count from heading below
+      setCount((prevState) => {
+         return prevState + 1;
+      });
+   };
+
+   const toggleContent = () => {
+      setShowCards((prevState) => {
+         return !prevState;
+      });
+   };
+
+   const navigate = useNavigate();
+
+   const goToPage = (e) => {
+      e.preventDefault();
+      console.log("Add Button Clicked");
+      navigate("/friends/new");
+   };
+
+   return (
+      <React.Fragment>
+         <div className="container">
+            <h1>Friends</h1>
+            <div className="row"></div>
+         </div>
+         <div className="container">
+            <h3 onClick={onHeaderClicked}>Rendering{count}</h3>
+            <div className="col">
+               <button
+                  className="btn btn-primary p-1 mx-4 shadow mb-3"
+                  onClick={goToPage}
+               >
+                  Add Friend
+               </button>
+               <button
+                  className="btn btn-primary p-1 mx-4 shadow mb-3"
+                  onClick={toggleContent}
+               >
+                  Toggle
+               </button>
+               <div className="row">{showCards && pageData.peopleComponents}</div>
+            </div>
+         </div>
+      </React.Fragment>
+   );
+}
+export default PeoplePage;
