@@ -1,0 +1,53 @@
+import React, { useState } from "react";
+import { Routes, Route } from "react-router-dom";
+import Home from "./Home";
+import Login from "./components/login/Login";
+import Register from "./components/register/Register";
+// import Product from "./components/codeChallenge/Product";
+import TestPage from "./components/events/TestAndAjax";
+import SiteNav from "./SiteNav";
+import Friends from "./components/friends/Friends";
+import Events from "./components/events/Events";
+import Jobs from "./components/jobs/Jobs";
+import Companies from "./components/techcompanies/Companies";
+import AddFriend from "./components/friends/AddFriend";
+// import ProductSender from "./components/ProductSender";
+// import Cars from "./components/codeChallenge/Cars";
+// import Person from "./components/Person";
+import "./App.css";
+// import debug from "sabio-debug";
+
+function App() {
+   const [user] = useState({
+      firstName: "James",
+      lastName: "Hughes",
+   });
+
+   return (
+      <React.Fragment>
+         <SiteNav />
+         <Routes>
+            <Route path="/" element={<Home user={user} />}></Route>
+            {/* <Route path="/sender" element={<ProductSender user={user} />}></Route> */}
+            <Route path="/Friends" element={<Friends user={user} />}></Route>
+            <Route path="/Friends/new" element={<AddFriend user={user} />}></Route>
+            <Route path="/Friends/:id" element={<AddFriend user={user} />}></Route>
+            <Route path="/Jobs" element={<Jobs user={user} />}></Route>
+            <Route path="/Companies" element={<Companies user={user} />}></Route>
+            <Route path="/Events" element={<Events user={user} />}></Route>
+            <Route path="/TestAndAjax" element={<TestPage />}></Route>
+            <Route path="/Login" element={<Login />}></Route>
+            <Route path="/Register" element={<Register />}></Route>
+            {/* <Route path="/Cars" element={<Cars />}></Route> */}
+
+            {/* <Route path="/Product" element={<Product/>}></Route> */}
+         </Routes>
+
+         <footer className="container">
+            <p>&copy; Sabio 2019-2020</p>
+         </footer>
+      </React.Fragment>
+   );
+}
+
+export default App;
