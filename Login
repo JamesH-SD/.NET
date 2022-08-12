@@ -1,0 +1,85 @@
+import React, { useState } from "react";
+import usersService from "../../services/userService";
+
+function Login() {
+   const [formData, setFormData] = useState({
+      email: "",
+      password: "",
+      tenantId: "U03ANH4GMUP",
+   });
+
+   const onSubmitClicked = (e) => {
+      e.preventDefault();
+      let payload = formData;
+      usersService.logIn(payload).then(onActionSuccess).catch(onActionError);
+   };
+
+   const onActionSuccess = (response) => {
+      console.log(response);
+   };
+
+   const onActionError = (error) => {
+      console.log(error);
+   };
+
+   const onDataChange = (e) => {
+      const target = e.target;
+      const value = target.value;
+      const name = target.name;
+
+      setFormData((prevState) => {
+         let newFormData = { ...prevState };
+         console.log(newFormData);
+         newFormData[name] = value;
+
+         return newFormData;
+      });
+   };
+
+   return (
+      <React.Fragment>
+         <div className="row">
+            <div className="col">
+               <form className="webForm">
+                  <div className="mb-3 formfields">
+                     <label className="form-label">Email address</label>
+                     <input
+                        type="email"
+                        className="form-control"
+                        id="InputEmail"
+                        aria-describedby="emailHelp"
+                        placeholder="Enter Your Email Address"
+                        onChange={onDataChange}
+                        value={formData.email}
+                        name="email"
+                     />
+                     <div id="emailHelp" className="form-text">
+                        We'll never share your email with anyone else.
+                     </div>
+                  </div>
+                  <div className="mb-3">
+                     <label className="form-label">Password</label>
+                     <input
+                        type="password"
+                        className="form-control"
+                        id="InputPassword1"
+                        placeholder="Enter Your Password"
+                        onChange={onDataChange}
+                        value={formData.password}
+                        name="password"
+                     />
+                  </div>
+                  <button
+                     type="submit"
+                     className="btn btn-primary"
+                     onClick={onSubmitClicked}
+                  >
+                     Submit
+                  </button>
+               </form>
+            </div>
+         </div>
+      </React.Fragment>
+   );
+}
+export default Login;
