@@ -1,0 +1,19 @@
+import { lazy } from 'react';
+const FileManager = lazy(() => import('../components/filemanager/FileManager'));
+
+
+const dashboardRoutes = [
+const fileManager = [
+    {
+        path: '/filemanager',
+        name: 'FileManager',
+        exact: true,
+        element: FileManager,
+        roles: ['Admin'],
+        isAnonymous: false,
+    },
+];
+];
+
+
+export default allRoutes;
