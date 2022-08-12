@@ -1,0 +1,137 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { Row, Col, Card, Container, Button } from 'react-bootstrap';
+import FileCard from './FileCard';
+import debug from 'sabio-debug';
+import toastr from 'toastr';
+import fileManagerService from '../../services/fileManagerService';
+import './filemanager.css';
+
+const _logger = debug.extend('FileManager');
+
+function FileManager() {
+    const [fileData, setFileData] = useState({ arrayOfFiles: [], fileComponentsMapped: [] });
+    const [queryData, setQueryData] = useState({ query: '' });
+
+    useEffect(() => {
+        fileManagerService.getAll(0, 6).then(onSuccessGetFile).catch(onErrorGetFile);
+    }, []);
+
+    const mapFile = (aFile) => {
+        _logger('Mapfile fx inside comp');
+        return <FileCard file={aFile} key={'FileM-' + aFile.id} />;
+    };
+
+    const onSuccessGetFile = (data) => {
+        let arrayOfF = data.item.pagedItems;
+        _logger({ arrayOfF });
+
+        setFileData((prevState) => {
+            const pd = { ...prevState };
+            pd.arrayOfFiles = arrayOfF;
+            pd.fileComponentsMapped = arrayOfF.map(mapFile);
+            return pd;
+        });
+    };
+
+    const onErrorGetFile = (err) => {
+        toastr.error('Unable to get Data', err);
+        _logger(err);
+    };
+
+    const onSearchFieldChange = (evt) => {
+        _logger('onChange', { syntheticEvent: evt });
+
+        const target = evt.target;
+        const fileSearchBarValue = target.value;
+
+        setQueryData((prevState) => {
+            const updatedFormData = {
+                ...prevState,
+            };
+
+            updatedFormData.query = fileSearchBarValue;
+            return updatedFormData;
+        });
+    };
+
+    const makeSearchApiCall = useCallback((pageIndex, pageSize, query) => {
+        fileManagerService.Search(pageIndex, pageSize, query).then(onSearchClickSuccess).catch(onSearchClickError);
+    });
+
+    const onSearchClick = (e) => {
+        e.preventDefault(e);
+        makeSearchApiCall(0, 5, queryData.query);
+    };
+
+    const onSearchClickSuccess = () => {
+        toastr.success('Search Successful');
+    };
+
+    const onSearchClickError = () => {
+        toastr.error('Unable to find searched item');
+    };
+
+    return (
+        <React.Fragment>
+            <div className="container">
+                <div className="row title-filemanager-cnmpro">
+                    <div className="col-3 text-center">
+                        <h1>File Manager</h1>
+                    </div>
+                </div>
+            </div>
+
+            <Row>
+                <Col>
+                    <Card>
+                        <Card.Body>
+                            <div className="page-aside-left"></div>
+
+                            <div className="page-aside-right">
+                                <div className="d-flex justify-content-between align-items-center">
+                                    <div className="app-search">
+                                        <form>
+                                            <div className="mb-2 position-relative">
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    id="query"
+                                                    name="query"
+                                                    placeholder="Search files..."
+                                                    value={queryData.query}
+                                                    onChange={onSearchFieldChange}
+                                                />
+                                                <Button onClick={onSearchClick} variant="secondary" size="sm">
+                                                    Search
+                                                </Button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div>
+                                        <button type="submit" className="btn btn-sm btn-light">
+                                            <i className="mdi mdi-format-list-bulleted"></i>
+                                        </button>
+                                        <button type="submit" className="btn btn-sm">
+                                            <i className="mdi mdi-view-grid"></i>
+                                        </button>
+                                        <button type="submit" className="btn btn-sm">
+                                            <i className="mdi mdi-information-outline"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <Container fluid="true">
+                                    <h5 className="mb-2">Current</h5>
+                                    <Row className="mx-n1 g-0"> {fileData.fileComponentsMapped}</Row>
+                                </Container>
+
+                                {/* <Recent recentFiles={recentFiles} /> */}
+                            </div>
+                        </Card.Body>
+                    </Card>
+                </Col>
+            </Row>
+        </React.Fragment>
+    );
+}
+
+export default FileManager;
