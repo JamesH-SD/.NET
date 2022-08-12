@@ -1,0 +1,61 @@
+import axios from "axios";
+import * as helper from "./serviceHelper";
+
+function getPeople() {
+   const config = {
+      method: "GET",
+      url: "https://localhost:50001/api/v2/friends?pageIndex=0&pageSize=10",
+      withCredentials: true,
+      crossdomain: true,
+      headers: { "Content-Type": "application/json" },
+   };
+   return axios(config).then(helper.onGlobalSuccess);
+}
+
+const addFriend = (payload) => {
+   const config = {
+      method: "POST",
+      url: "https://localhost:50001/api/v2/friends",
+      data: payload,
+      withCredentials: true,
+      crossdomain: true,
+      headers: { "Content-Type": "application/json" },
+   };
+
+   console.log(payload);
+   return axios(config);
+};
+
+const updateFriend = (id) => {
+   const config = {
+      method: "PUT",
+      url: `https://localhost:50001/api/v2/friends/${id}`,
+      data: id,
+      withCredentials: true,
+      crossdomain: true,
+      headers: { "Content-Type": "application/json" },
+   };
+   return axios(config);
+};
+
+function deleteFriendsById(personId) {
+   console.log("Heres my Id", personId);
+   const config = {
+      method: "DELETE",
+      url: `https://localhost:50001/api/v2/friends/${personId}`,
+      withCredentials: true,
+      crossdomain: true,
+      headers: { "Content-Type": "application/json" },
+   };
+   return axios(config).then(() => {
+      // this is called a closure. We are returning the id to us to pass to the next function
+
+      return personId;
+   });
+}
+// this is a global handler that unpacks response.
+// it also gives you the ability to grab the data upfront incase you want to do something with it.
+// it is locate under the serviceHelper service file
+
+const peopleService = { getPeople, deleteFriendsById, addFriend, updateFriend };
+export default peopleService;
