@@ -1,0 +1,95 @@
+import React, { useState, useEffect } from "react";
+import { Grid, GridColumn, GridToolbar } from "@progress/kendo-react-grid";
+import { process } from "@progress/kendo-data-query";
+import { ExcelExport } from "@progress/kendo-react-excel-export";
+import sample from "./sample.json";
+import "@progress/kendo-theme-material";
+import courseService from "./services/courseService";
+
+const BoolCell = (props) => {
+   return <td>{props.dataItem[props.field] ? "Yes" : "No"}</td>;
+};
+
+function App() {
+   const [dataState, setDataState] = useState({
+      skip: 0,
+      take: 10,
+   });
+
+   const [result, setResult] = useState(process(sample, dataState));
+
+   useEffect(() => {
+      console.log("Firing userEffect");
+
+      courseService.getCourses().then(onGetCourseSuccess).catch(onGetCourseError);
+   }, []);
+
+   const onGetCourseSuccess = (data) => {
+      console.log(data.data.items); 
+   };
+
+   const onGetCourseError = (error) => {
+      console.log("I got People issues", error);
+   };
+   const onDataStateChange = (event) => {
+      setDataState(event.dataState);
+      setResult(process(sample, event.dataState));
+   };
+
+   let _export;
+   const exportExcel = () => {
+      _export.save();
+   };
+
+   return (
+      <div className="App">
+         <h1>Telerik Grid</h1>
+         <ExcelExport
+            data={sample}
+            ref={(exporter) => {
+               _export = exporter;
+            }}
+         >
+            <Grid
+               style={{
+                  height: "750px",
+               }}
+               data={result}
+               pageable={true}
+               filterable={true}
+               sortable={true}
+               groupable={true}
+               total={sample.length}
+               onDataStateChange={onDataStateChange}
+               {...dataState}
+            >
+               <GridToolbar>
+                  <button
+                     title="Export to Excel"
+                     className="k-button k-button-md k-rounded-md k-button-solid k-button-solid-primary"
+                     onClick={exportExcel}
+                  >
+                     Export to Excel
+                  </button>
+               </GridToolbar>
+
+               <GridColumn
+                  field="ProductName"
+                  title="Product Name"
+                  filterable={true}
+               />
+               <GridColumn field="UnitPrice" title="Unit Price" />
+               <GridColumn field="UnitsInStock" title="Units in Stock" />
+               <GridColumn
+                  field="Discontinued"
+                  title="Discontinued"
+                  filterable={true}
+                  cell={BoolCell}
+               />
+            </Grid>
+         </ExcelExport>
+      </div>
+   );
+}
+
+export default App;
